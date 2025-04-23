@@ -1,5 +1,6 @@
 import { scaleFactor } from './constant.js';
 import { k } from './KaboomCtx.js';
+import { setCamScale } from './utils.js';
 
 k.loadSprite("spritesheet", "./spritesheet.png", {
     sliceX: 39,
@@ -22,8 +23,7 @@ k.scene("main", async () => {
     const mapData = await (await fetch("./map.json")).json();
     const layers = mapData.layers;
 
-    const map = k.make([
-        k.sprite("map"), k.pos(0), k.scale(scaleFactor)])
+    const map = k.add([k.sprite("map"), k.pos(0), k.scale(scaleFactor)]);
 
     const player = k.make([
         k.sprite(k.sprite("spritesheet"),{ anim: "idle-down" }),
@@ -52,8 +52,62 @@ k.scene("main", async () => {
               k.pos(boundary.x, boundary.y),
               boundary.name,
             ]);
+
+            if (boundery.name) {
+                player.onCollide(boundery.name, () => {
+                    player.isInDialogue = true;
+                    displayDialogue("TODO", () => (player.isInDialogue = false));
+                });
+            }
           }
+          continue
+        }
+
+        if (layer.name === "spawnpoints") {
+            for (const entity of layer.objects) {
+              if (entity.name === "player") {
+                player.pos = k.vec2(
+                  (map.pos.x + entity.x) * scaleFactor,
+                  (map.pos.y + entity.y) * scaleFactor
+                );
+                k.add(player);
+                continue;
+                }
+            }
         }
     }
+
+    setCamScale(k);
+
+    k.onResize(() => {
+       setCamScale(k);
+    });
+
+    k.onUpdate(() => {
+        k.camPos(player.pos.x, player.pos.y + 100);
 });
+
+    k.onMouseDown((mouseBtn) => {
+        if (mouseBtn !== "left" || player.isInDialogue) return;
+
+        const worldmousePos = k.toWorld(k.mousePos());
+        player.moveTo(worldmousePos, player.speed);
+
+        const mouseAngle = player.pos.angle(worldmousePos);
+
+        const lowerBound = 50;
+        const upperBound = 125;
+
+        if (
+            mouseAngle > lowerBound &&
+            mouseAngle < upperBound &&
+            player.curAnim() !== "walk-up"
+          ) {
+            player.play("walk-up");
+            player.direction = "up";
+            return;
+          }
+    });
+});
+
 k.go("main");
