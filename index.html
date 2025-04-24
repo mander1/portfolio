@@ -22,7 +22,7 @@
       #app {
         width: 100%;
         height: 100%;
-        overflow: hidden;
+        position: relative;
       }
 
       #textbox {
@@ -42,6 +42,7 @@
         align-items: flex-start;
         word-spacing: 0.2rem;
         filter: drop-shadow(0 0 0.75rem rgb(112, 112, 112));
+        /* overflow: auto; */
       }
 
       .ui-text {
@@ -71,12 +72,13 @@
         color: rgb(238, 238, 238);
       }
     </style>
-    <div id="app"></div>
-      <div id="ui">
-        <p class="note">Tap/Click to move</p>
+    <div id="app">
+      <div>
+        <p class="note">Tap/Click around to move</p>
+
         <div id="textbox-container" style="display: none">
           <div id="textbox">
-            <p id ="dialoge" class="ui-text"></p>
+            <p id="dialogue" class="ui-text"></p>
             <div class="btn-container">
               <button id="close" class="ui-close-btn">Close</button>
             </div>
@@ -84,7 +86,7 @@
         </div>
       </div>
       <canvas id="game"></canvas>
-  </div>
-    <script type="module" src="/src/main.js"></script>
+    </div>
+    <script type="module" src="src/main.js"></script>
   </body>
 </html>
